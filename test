@@ -1,0 +1,22 @@
+# Export the variables needed to complete your build, we'll assume you are building for the RG353M, update the device to match your configuration.
+export OS_VERSION=$(date +%Y%m%d) BUILD_DATE=$(date)
+export PROJECT=Rockchip DEVICE=RG353P ARCH=aarch64
+
+
+package=swanstation
+
+
+# Clean the package you are building.
+./scripts/clean ${package}
+
+
+# Build the package.
+./scripts/build ${package}
+
+
+# Install the package into the build root.
+./scripts/install ${package}
+
+
+# Generate an image with your new package.
+./scripts/image mkimage
