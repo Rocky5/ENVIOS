@@ -1,12 +1,12 @@
-&nbsp;&nbsp;<img src="https://raw.githubusercontent.com/JustEnoughLinuxOS/distribution/dev/distributions/JELOS/logos/jelos-logo.png" width=192>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Latest Version](https://img.shields.io/github/release/JustEnoughLinuxOS/distribution.svg?color=5998FF&label=latest%20version&style=flat-square)](https://github.com/JustEnoughLinuxOS/distribution/releases/latest) [![Activity](https://img.shields.io/github/commit-activity/m/JustEnoughLinuxOS/distribution?color=5998FF&style=flat-square)](https://github.com/JustEnoughLinuxOS/distribution/commits) [![Pull Requests](https://img.shields.io/github/issues-pr-closed/JustEnoughLinuxOS/distribution?color=5998FF&style=flat-square)](https://github.com/JustEnoughLinuxOS/distribution/pulls) [![Discord Server](https://img.shields.io/discord/948029830325235753?color=5998FF&label=chat&style=flat-square)](https://discord.gg/seTxckZjJy)
+&nbsp;&nbsp;<img src="https://raw.githubusercontent.com/Rocky5/distribution/main/distributions/JELOS/logos/jelos-logo.png" width=192>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Latest Version](https://img.shields.io/github/release/Rocky5/distribution.svg?color=5998FF&label=latest%20version&style=flat-square)](https://github.com/Rocky5/ENVIOS/releases/latest)
 #
-Just Enough Linux Operating System (JELOS) is a community developed Linux distribution for handheld gaming devices.  Our goal is to produce an operating system that has the features and capabilities that we need, and to have fun as we develop it.
+ENVIOS powered by (JELOS, but not supported by) is a community developed Linux distribution for handheld gaming devices.  Our goal is to produce an operating system that has the features and capabilities that we need, and to have fun as we develop it.
 
 ## Licenses
-JELOS is a Linux distribution that is made up of many open-source components.  Components are provided under their respective licenses.  This distribution includes components licensed for non-commercial use only.
+ENVIOS (JELOS) is a Linux distribution that is made up of many open-source components.  Components are provided under their respective licenses.  This distribution includes components licensed for non-commercial use only.
 
-### JELOS Branding
-JELOS branding and images are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
+### ENVIOS (JELOS) Branding
+ENVIOS (JELOS) branding and images are licensed under a [Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License](https://creativecommons.org/licenses/by-nc-sa/4.0/).
 
 #### You are free to
 * Share — copy and redistribute the material in any medium or format
@@ -17,8 +17,9 @@ JELOS branding and images are licensed under a [Creative Commons Attribution-Non
 * NonCommercial — You may not use the material for commercial purposes.
 * ShareAlike — If you remix, transform, or build upon the material, you must distribute your contributions under the same license as the original.
 
-### JELOS Software
-Copyright 2021-present Fewtarius
+### ENVIOS (JELOS) Software
+JELOS Copyright 2021-present Fewtarius
+ENVIOS Copyright 2022-present Fewtarius & Rocky5
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -33,7 +34,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 ## Installation
-* JELOS is a source based Linux distribution.  To install, follow BUILDING.md and then write the resulting image to your micro sd card using your favorite image writing tool.
+* ENVIOS (JELOS) is a source based Linux distribution.  To install, follow BUILDING.md and then write the resulting image to your micro sd card using your favorite image writing tool.
 
 ## Network Access
 * External services are disabled by default in stable builds.  When enabled, the username for ssh and samba access is "root".  The root password is generated during every boot, it can be found in the System Settings menu.
