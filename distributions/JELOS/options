@@ -8,7 +8,7 @@
   HARDENING_SUPPORT="no"
 
 # The name of the parent organization for updates
-  GIT_ORGANIZATION="JustEnoughLinuxOS"
+  GIT_ORGANIZATION="Rocky5"
 
 # The name of the github project for updates
   GIT_REPO="distribution"
@@ -17,7 +17,7 @@
   DISTRONAME="JELOS"
 
 # short project description
-  DESCRIPTION="An Open Source firmware."
+  DESCRIPTION="An Open Source firmware. Powered by JELOS but not supported by."
 
 # Distribution Home URL
   HOME_URL="https://www.jelos.org"
@@ -132,7 +132,7 @@
 
 # Distribution Specific source location
   DISTRO_MIRROR=""
-  DISTRO_SRC="https://github.com/JustEnoughLinuxOS"
+  DISTRO_SRC="https://github.com/Rocky5"
 
 # Default size of system partition, in MB, eg. 512
   SYSTEM_SIZE=2048
@@ -143,7 +143,7 @@
   GET_HANDLER_SUPPORT="archive git file"
 
 # Partition labels for USB/SD installation media
-  DISTRO_BOOTLABEL="JELOS"
+  DISTRO_BOOTLABEL="ENVIOS"
   DISTRO_DISKLABEL="STORAGE"
 
 # Settings package name - blank if not required

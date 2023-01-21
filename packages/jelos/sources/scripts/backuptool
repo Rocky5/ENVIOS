@@ -15,6 +15,9 @@
 #   /some/other/folder/file.name*
 # )
 
+# Distro isn't being populated for some reason.
+DISTRO=ENVIOS
+
 BACKUPFOLDER="/storage/roms/backup"
 BACKUPFILE="${BACKUPFOLDER}/${DISTRO}_BACKUP.zip"
 mkdir -p ${BACKUPFOLDER}

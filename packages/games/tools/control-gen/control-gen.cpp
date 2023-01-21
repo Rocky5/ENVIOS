@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 // Copyright (C) 2022-present BrooksyTech (https://github.com/brooksytech)
 
+
+#include <cstdlib>
 #include <stdio.h>
 #include <SDL.h>
 

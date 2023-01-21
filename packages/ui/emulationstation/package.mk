@@ -3,7 +3,7 @@
 # Copyright (C) 2020-present Fewtarius
 
 PKG_NAME="emulationstation"
-PKG_VERSION="07285b7"
+PKG_VERSION="93ccec0"
 PKG_GIT_CLONE_BRANCH="main"
 PKG_REV="1"
 PKG_ARCH="any"
@@ -62,6 +62,10 @@ PKG_CMAKE_OPTS_TARGET+=" -DENABLE_EMUELEC=1 -DDISABLE_KODI=1 -DENABLE_FILEMANAGE
 # chmod +x ./emulationstation
 # ./emulationstation
 ##########################################################################################################
+
+ES_Source=~/Documents/GitHub/emulationstation
+[ -d "$ES_Source" ] && EMULATIONSTATION_SRC=$ES_Source
+
 if [ -n "${EMULATIONSTATION_SRC}" ]; then
 unpack() {
   echo cp -PRf ${EMULATIONSTATION_SRC} ${PKG_BUILD}
@@ -112,14 +116,15 @@ makeinstall_target() {
 	ln -sf /storage/.config/emulationstation/themes ${INSTALL}/etc/emulationstation/
 	ln -sf /usr/config/emulationstation/es_systems.cfg ${INSTALL}/etc/emulationstation/es_systems.cfg
 
-        cp -rf ${PKG_DIR}/config/common/*.cfg ${INSTALL}/usr/config/emulationstation
+	cp -rf ${PKG_DIR}/config/common/*.cfg ${INSTALL}/usr/config/emulationstation
 	cp -rf ${PKG_DIR}/config/device/${DEVICE}/*.cfg ${INSTALL}/usr/config/emulationstation
 
 	ln -sf /storage/.cache/system_timezone ${INSTALL}/etc/timezone
-
+	chmod 0755 ${INSTALL}/usr/bin/emulationstation
 }
 
 post_install() {
 	mkdir -p ${INSTALL}/usr/share
 	ln -sf /storage/.config/emulationstation/locale ${INSTALL}/usr/share/locale
 }
+
