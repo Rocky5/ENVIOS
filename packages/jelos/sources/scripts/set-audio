@@ -1,0 +1,276 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2020-present Fewtarius
+
+. /etc/profile
+
+ES_SETTINGS="/storage/.config/emulationstation/es_settings.cfg"
+STORED_SETTINGS="/storage/.cache/audio_settings.zip"
+
+function save_state()
+{
+  ACTIVE_DEVICE=$(get_audio_device)
+  ACTIVE_PATH=$(get_es_path)
+  echo "$ACTIVE_DEVICE" > /tmp/active_device.cfg
+  echo "$ACTIVE_PATH" > /tmp/active_path.cfg
+  cp -f /storage/.config/asound.conf /tmp 
+  cp -f /storage/.config/asound.state /tmp
+  zip -q -j -r ${STORED_SETTINGS} /tmp/active_device.cfg /tmp/active_path.cfg /tmp/asound.*
+}
+
+function restore_state()
+{
+  if [ -e ${STORED_SETTINGS} ]
+  then
+    unzip -o -q -d /tmp/ ${STORED_SETTINGS}
+    STORED_DEVICE=$(cat /tmp/active_device.cfg)
+    STORED_PATH=$(cat /tmp/active_path.cfg)
+    mv /tmp/asound.conf /storage/.config/
+    mv /tmp/asound.state /storage/.config/
+    rm -f ${STORED_SETTINGS}
+    set-audio esset "${STORED_PATH}"
+    set-audio set "${STORED_DEVICE}"
+  fi
+}
+
+# Check if an audio device string corresponds to a bluetooth device
+function is_bluetooth() {
+  if [[ "$1" =~ ^Device.* ]]
+  then
+    true
+    return
+  else
+    false
+    return
+  fi
+}
+
+function list_audio_controls() {
+  IFS=""
+  ACTIVE_DEVICE=$(get_audio_device)
+  if is_bluetooth "${ACTIVE_DEVICE}"
+  then
+    CONTROLS=$(amixer -D bluealsa controls | sed -e 's#^.*name=##g' -e "s#'##g")
+  else
+    CONTROLS=$(amixer controls | sed -e 's#^.*name=##g' -e "s#'##g")
+  fi
+  echo "DEFAULT (SYSTEM PROVIDED)"
+  echo "CUSTOM (UNMANAGED)"
+  for CONTROL in "${CONTROLS[@]}"
+  do
+    echo ${CONTROL} | awk '{print $1}' | grep -v -E 'Mic|Extension|Capture|Differential|Left|Right' | uniq
+  done
+  echo "--------"
+  for CONTROL in "${CONTROLS[@]}"
+  do
+    echo ${CONTROL}
+  done
+}
+
+function list_audio_devices() {
+  echo "DEFAULT (SYSTEM PROVIDED)"
+  echo "DEFAULT HDMI"
+  echo "CUSTOM (UNMANAGED)"
+  echo "--------"
+  BTACTIVE=$(systemctl is-active bluetooth)
+  if [ "${BTACTIVE}" == "active" ]
+  then
+    BTDEVICES=$(bluetoothctl devices Paired)
+    while read -r BTDEV
+    do
+      echo "${BTDEV}"
+    done <<< "${BTDEVICES}"
+    echo "--------"
+  fi
+  for SDEVICE in $(find /proc/asound/card*/pcm*/info)
+  do
+    TYPE=$(awk '/^stream:/ {print $2}' ${SDEVICE})
+    if [[ "${TYPE}" =~ PLAYBACK ]]
+    then
+      CARD=$(awk '/^card:/ {print $2}' ${SDEVICE})
+      DEVICE=$(awk '/^device:/ {print $2}' ${SDEVICE})
+      NAME=$(awk '/^name:/ {print $2}' ${SDEVICE})
+      echo "${NAME} (${CARD}:${DEVICE})"
+    fi
+  done
+}
+
+function set_audio_device() {
+  SELECTION="$1"
+  # When switching from a non-bluetooth to a bluetooth device,
+  # store the last configuration in order to restore it on reboot.
+  if is_bluetooth "${SELECTION}"
+  then
+    ACTIVE_DEVICE=$(get_audio_device)
+    if ! is_bluetooth "${ACTIVE_DEVICE}"
+    then
+      save_state 
+    fi
+  fi
+
+  set_setting system.audiodevice "${SELECTION}"
+  if [ "${SELECTION}" == "DEFAULT (SYSTEM PROVIDED)" ]
+  then
+    if [ "$(get_setting system.rg353v)" = "1" ]
+    then
+      cp /usr/config/asound.conf.RG353V /storage/.config/asound.conf
+      exit 0
+    else
+      CARD="0"
+      HWDEV="hw:${CARD},0"
+    fi
+  elif [ "${SELECTION}" == "DEFAULT HDMI" ]
+  then
+    CARD="0"
+    HWDEV="hdmi"
+  elif [ "${SELECTION}" == "CUSTOM (UNMANAGED)" ]
+  then
+    exit 0
+  elif is_bluetooth "${SELECTION}"
+  then
+    MAC=$(echo "${SELECTION}" | awk '/^Device/ {print $2}')
+    # Reconnect device in case it auto-connected.
+    # This doesn't seem necessary anymore, re-activate in case of issues.
+    # bluetoothctl disconnect ${MAC}
+    if bluetoothctl connect ${MAC}
+    then
+      cp /usr/config/asound.conf.bluealsa /storage/.config/asound.conf
+      set_es_path "DEFAULT (SYSTEM PROVIDED)"
+    fi 
+    exit 0
+  else
+    if [ "${SELECTION}" == "--------" ]
+    then
+      exit 0
+    fi
+    for SDEVICE in $(find /proc/asound/card*/pcm*/info)
+    do
+      TYPE=$(awk '/^stream:/ {print $2}' ${SDEVICE})
+      if [[ "${TYPE}" =~ PLAYBACK ]]
+      then
+        CARD=$(awk '/^card:/ {print $2}' ${SDEVICE})
+        DEVICE=$(awk '/^device:/ {print $2}' ${SDEVICE})
+        NAME=$(awk '/^name:/ {print $2}' ${SDEVICE})
+        if [ "${SELECTION}" == "${NAME} (${CARD}:${DEVICE})" ]
+        then
+          HWDEV="hw:${CARD},${DEVICE}"
+        fi
+      fi
+    done
+  fi
+  if [[ "${HWDEV}" =~ ^hw ]]
+  then
+    cat <<EOF >/storage/.config/asound.conf
+ctl.!default {
+  type hw
+  card ${CARD}
+}
+
+pcm.!default {
+	type plug
+	slave.pcm "dmixer"
+}
+
+pcm.dmixer  {
+	type dmix
+	ipc_key 1024
+	slave {
+	    pcm "${HWDEV}"
+	    period_time 0
+	    period_size 1024
+	    buffer_size 4096
+	    rate 44100
+	}
+	bindings {
+	    0 0
+	    1 1
+	}
+}
+EOF
+  else
+    cat <<EOF >/storage/.config/asound.conf
+pcm.!default {
+  type plug
+  slave {
+    pcm "${HWDEV}"
+  }
+}
+
+ctl.!default {
+  type hw
+  card ${CARD}
+}
+EOF
+  fi
+}
+
+function set_es_path() {
+  AUDIODEVICE=${1}
+ if [ "${AUDIODEVICE}" == "CUSTOM (UNMANAGED)" ] || \
+    [ "${AUDIODEVICE}" == "--------" ]
+  then
+    exit 0
+  fi
+  AUDIOTEST=$(grep "AudioDevice" ${ES_SETTINGS} 2>/dev/null)
+  sed -i '/^.*<string name="AudioDevice".*$/d' ${ES_SETTINGS}
+  if [ -e "/storage/.config/profile.d/99-mixer" ]
+  then
+    rm "/storage/.config/profile.d/99-mixer"
+  fi
+  if [ ! "${AUDIODEVICE}" = "DEFAULT (SYSTEM PROVIDED)" ]
+  then
+    sed -i '/^.*AudioCard.*$/a \\t<string name="AudioDevice" value="'"${AUDIODEVICE}"'" \/>' ${ES_SETTINGS}
+    echo "DEVICE_AUDIO_MIXER=\"${AUDIODEVICE}\"" >/storage/.config/profile.d/99-mixer
+    if [ "${DEVICE_VOLUMECTL}" = true ]
+    then
+      systemctl restart volume
+    fi
+  fi
+}
+
+function get_audio_device() {
+  MYAUDIODEVICE=$(get_setting system.audiodevice)
+  if [ ! -z "${MYAUDIODEVICE}" ]
+  then
+    echo ${MYAUDIODEVICE}
+  else
+    echo "DEFAULT (SYSTEM PROVIDED)"
+  fi
+}
+
+function get_es_path() {
+  AUDIODEVICE=$(grep AudioDevice ${ES_SETTINGS} | sed -e 's#^.*="##g' -e 's#"\ .*$##g')
+  if [ -z "${AUDIODEVICE}" ]
+  then
+    echo "DEFAULT (SYSTEM PROVIDED)"
+  else
+    echo "${AUDIODEVICE}"
+  fi
+}
+
+case $1 in
+  controls)
+    list_audio_controls
+  ;;
+  list)
+     list_audio_devices
+  ;;
+  set)
+    set_audio_device "$2"
+  ;;
+  esset)
+    set_es_path "$2"
+  ;;
+  get)
+    get_audio_device
+  ;;
+  esget)
+    get_es_path
+  ;;
+  save)
+    save_state
+  ;;
+  restore)
+    restore_state
+  ;;
+esac

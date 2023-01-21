@@ -1,0 +1,128 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2020 Fewtarius (https://github.com/fewtarius)
+# Copyright (C) 2022 kkoshelev (https://github.com/kkoshelev)
+
+. /etc/profile
+
+COMMAND="$1"
+
+### ES won't save the configuration in time
+### for it to be useable by the script, so
+### we have to accept the ssid and key on the
+### command line too.
+
+if [ ! -z "${2}" ]
+then
+  SSID="${2}"
+else
+  SSID="$(get_setting wifi.ssid)" 2>/dev/null
+fi
+
+if [ ! -z "${3}" ]
+then
+  PSK="${3}"
+else
+  PSK="$(get_setting wifi.key)" 2>/dev/null
+fi
+
+WIFICFG="/storage/.cache/connman/wifi.config"
+
+# lists all wifi services in service=ssid format
+list_wifi() {
+  connmanctl services | cut -b 5- | awk '/\S+.+\s+wifi/ {a=$0; sub(/\s+wifi_.*$/,"", a); b=$0; sub(a, "", b); sub(/\s+/, "", b); print b "=" a}' | sort | uniq
+}
+
+# Looksup connman service name based on ssid
+# $1 - SSID to lookup
+get_wifi_service() {
+  list_wifi | awk -v ssid="${1}" '{ split($0, a, "="); if (a[2]==ssid) print a[1] }'
+}
+
+set_powersave() {
+  ENABLED=$(get_setting wifi.powersave)
+  if [ "${ENABLED}" = "1" ]
+  then
+    iw wlan0 set power_save on
+  else
+    iw wlan0 set power_save off
+  fi
+}
+
+get_wifi_state() {
+  STATE=$(connmanctl state | awk '/State/ {print $3}' 2>/dev/null)
+  echo ${STATE}
+}
+
+check_wifi() {
+  SSID_CHK=$(grep "${SSID}" ${WIFICFG} 2>/dev/null)
+  KEY_CHK=$(grep "${PSK}" ${WIFICFG} 2>/dev/null)
+  STATE=$(get_wifi_state)
+  if [ -n "${SSID_CHK}" ] && \
+     [ -n "${KEY_CHK}" ] && \
+     [ "${STATE}" = "online" ]
+  then
+    exit 0
+  fi
+}
+
+set_wifi() {
+  case "${1}" in
+    "enable")
+      check_wifi
+      set_setting wifi.enabled 1
+      # Create the WIFI config.
+      cat > "${WIFICFG}" <<EOF
+[global]
+Name=${OS_NAME}
+
+[service_${OS_NAME}_default]
+Type = wifi
+Name = ${SSID}
+Passphrase = ${PSK}
+AutoConnect = true
+EOF
+
+      STATE=$(get_wifi_state)
+      if [ ! "${STATE}" = "online" ]
+      then
+        connmanctl enable wifi 2>/dev/null
+      fi
+      set_powersave 2>/dev/null
+      nohup connmanctl connect $(get_wifi_service "${SSID}") 2>/dev/null &
+    ;;
+    "disable")
+      connmanctl disable wifi 2>/dev/null
+      rm -f "${WIFICFG}" 2>/dev/null
+      set_setting wifi.enabled 0
+    ;;
+    "reconnect")
+      /usr/bin/wifictl disable
+      /usr/bin/wifictl enable
+    ;;
+    "list")
+      #connmanctl services | cut -b 5- | awk '/wifi/ {sub(/\s+wifi_.*$/,"",$0);print}' | sort | uniq
+      list_wifi | awk '{sub(/\S+=/,"",$0);print}'
+    ;;
+    "scan")
+      connmanctl scan wifi 2>/dev/null
+    ;;
+    "scanlist")
+      set_wifi scan 2>/dev/null
+      list_wifi | awk '{sub(/\S+=/,"",$0);print}'
+    ;;
+    "service")
+       get_wifi_service "${SSID}"
+    ;;
+    "setpowersave")
+      set_powersave 2>/dev/null
+    ;;
+  esac
+}
+
+if [ ! -d "" ]
+then
+  mkdir -p "/storage/.cache/connman"
+fi
+
+set_wifi ${COMMAND}

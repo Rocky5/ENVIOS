@@ -1,0 +1,29 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2020-present Fewtarius
+
+CONFIGPATH="/storage/.config"
+
+if [ -e "${CONFIGPATH}/rsync.conf" ]
+then
+  source ${CONFIGPATH}/rsync.conf
+fi
+
+# If rsync.conf is missing variables set defaults
+MOUNTPATH="${MOUNTPATH:=/storage/cloud}"
+SYNCPATH="${SYNCPATH:=GAMES}"
+BACKUPPATH="${BACKUPPATH:=/storage/roms}"
+RSYNCOPTSRESTORE="${RSYNCOPTSRESTORE:=-raiv}"
+
+echo -e "=> ${OS_NAME} CLOUD RESTORE UTILITY\n"
+
+echo "Mounting ${MOUNTPATH}" 2>&1
+rclonectl mount ${MOUNTPATH} 2>&1
+
+echo "Restoring data from ${MOUNTPATH}/${SYNCPATH} to ${BACKUPPATH}" 2>&1
+rsync ${RSYNCOPTSRESTORE} --include-from="${CONFIGPATH}/rsync-rules.conf" ${MOUNTPATH}/${SYNCPATH}/ ${BACKUPPATH}/ 2>&1
+
+echo "Unmounting ${MOUNTPATH}" 2>&1
+rclonectl unmount ${MOUNTPATH} 2>&1
+sleep 3
+clear

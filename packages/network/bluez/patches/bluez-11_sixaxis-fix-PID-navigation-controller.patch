@@ -1,0 +1,39 @@
+diff --git a/plugins/sixaxis.c b/plugins/sixaxis.c
+index 544ab399a..9a0aa5d4f 100644
+--- a/plugins/sixaxis.c
++++ b/plugins/sixaxis.c
+@@ -349,7 +349,13 @@ static bool setup_device(int fd, const char *sysfs_path,
+ 	info("sixaxis: setting up new device");
+ 
+ 	btd_device_device_set_name(device, cp->name);
+-	btd_device_set_pnpid(device, cp->source, cp->vid, cp->pid, cp->version);
++
++	/* if device reports different pid/vid on BT prefer those over USB */
++	if (cp->bt_pid)
++		btd_device_set_pnpid(device, cp->source, cp->vid, cp->bt_pid, cp->version);
++	else
++		btd_device_set_pnpid(device, cp->source, cp->vid, cp->pid, cp->version);
++
+ 	btd_device_set_temporary(device, true);
+ 
+ 	closure = g_new0(struct authentication_closure, 1);
+diff --git a/profiles/input/sixaxis.h b/profiles/input/sixaxis.h
+index ab8831995..0fe373204 100644
+--- a/profiles/input/sixaxis.h
++++ b/profiles/input/sixaxis.h
+@@ -25,6 +25,7 @@ struct cable_pairing {
+ 	uint16_t vid;
+ 	uint16_t pid;
+ 	uint16_t version;
++	uint16_t bt_pid;
+ 	CablePairingType type;
+ };
+ 
+@@ -54,6 +55,7 @@ get_pairing(uint16_t vid, uint16_t pid, const char *name)
+ 			.vid = 0x054c,
+ 			.pid = 0x042f,
+ 			.version = 0x0000,
++			.bt_pid = 0x0268,
+ 			.type = CABLE_PAIRING_SIXAXIS,
+ 		},
+ 		{

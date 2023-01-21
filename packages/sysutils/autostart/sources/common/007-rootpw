@@ -1,0 +1,22 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2021-present Fewtarius (https://github.com/fewtarius)
+
+. /etc/profile
+
+if [ ! -d "/storage/.cache/samba" ]
+then
+  mkdir -p /storage/.cache/samba
+  touch /storage/.cache/samba/smbpasswd
+fi
+
+ROTATION=$(get_setting rotate.root.password)
+if [ "${ROTATION}" == "0" ]
+then
+  exit 0
+fi
+
+# Randomly generate the root password on startup
+ROOTPASS=$(openssl rand -base64 10 2>/dev/null | sed "s#==##g")
+
+/usr/bin/setrootpass "${ROOTPASS}"

@@ -1,0 +1,17 @@
+[Unit]
+Description=EmulationStation emulator frontend
+ConditionPathExists=/var/lock/start.games
+
+[Service]
+Environment=HOME=/storage
+Environment=SDL_AUDIODRIVER=alsa
+ExecStartPre=/usr/bin/es_settings
+ExecStart=/usr/bin/emulationstation --log-path /var/log
+KillMode=process
+TimeoutStopSec=3
+Restart=always
+RestartSec=2
+StartLimitInterval=0
+
+[Install]
+WantedBy=jelos.target

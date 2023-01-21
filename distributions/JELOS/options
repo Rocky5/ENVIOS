@@ -1,0 +1,153 @@
+# LTO (Link Time Optimization) support
+  LTO_SUPPORT="yes"
+
+# GOLD (Google Linker) support
+  GOLD_SUPPORT="yes"
+
+# HARDENING (security relevant linker and compiler flags) support
+  HARDENING_SUPPORT="no"
+
+# The name of the parent organization for updates
+  GIT_ORGANIZATION="JustEnoughLinuxOS"
+
+# The name of the github project for updates
+  GIT_REPO="distribution"
+
+# Name of the Distro to build (full name, without special characters)
+  DISTRONAME="JELOS"
+
+# short project description
+  DESCRIPTION="An Open Source firmware."
+
+# Distribution Home URL
+  HOME_URL="https://www.jelos.org"
+
+# Documentation URL
+  WIKI_URL="https://www.jelos.org"
+
+# Where to report bugs
+  BUG_REPORT_URL="https://www.jelos.org"
+
+# Root password to integrate in the target system
+  ROOT_PASSWORD="system generated"
+
+# Remove kernel and system files from the release directory.
+  COREELEC_TARGET_REMOVE="kernel_system"
+
+# Install glibc locales to the build (yes / no)
+  GLIBC_LOCALES="yes"
+
+# build and install PulseAudio support (yes / no)
+  PULSEAUDIO_SUPPORT="yes"
+
+# additional drivers to install:
+# for a list of additional drivers see packages/linux-drivers
+# Space separated list is supported,
+# e.g. ADDITIONAL_DRIVERS="DRIVER1 DRIVER2"
+#  ADDITIONAL_DRIVERS=""
+
+# build and install bluetooth support (yes / no)
+  BLUETOOTH_SUPPORT="yes"
+
+# build and install Avahi (Zeroconf) daemon (yes / no)
+  AVAHI_DAEMON="yes"
+
+# build with NFS support (mounting nfs shares via the OS) (yes / no)
+  NFS_SUPPORT="no"
+
+# build with Samba Client support (mounting samba shares via the OS) (yes / no)
+  SAMBA_SUPPORT="no"
+
+# build and install Samba Server (yes / no)
+  SAMBA_SERVER="no"
+
+# build and install SFTP Server (yes / no)
+  SFTP_SERVER="yes"
+
+# build and install OpenVPN support (yes / no)
+  OPENVPN_SUPPORT="no"
+
+# build and install WireGuard support (yes / no)
+  WIREGUARD_SUPPORT="yes"
+
+# build and install diskmounter support (udevil)
+# this service provide auto mounting support for external drives in the
+# mediacenter also automount internally drives at boottime via udev (yes / no)
+  UDEVIL="yes"
+
+# build and install exFAT fuse support (yes / no)
+  EXFAT="yes"
+
+# build and install NTFS-3G fuse support (yes / no)
+  NTFS3G="yes"
+
+# build and install hfs filesystem utilities (yes / no)
+  HFSTOOLS="yes"
+
+# Windowmanager to use (fluxbox / none)
+  WINDOWMANAGER="none"
+
+# Xorg Graphic drivers to use (all / i915,i965,r200,r300,r600,nvidia)
+# Space separated list is supported,
+# e.g. GRAPHIC_DRIVERS="i915 i965 r300 r600 radeonsi nvidia"
+  GRAPHIC_DRIVERS=""
+
+# build and install remote support (yes / no)
+  REMOTE_SUPPORT="yes"
+
+# build and install Joystick support (yes / no)
+  JOYSTICK_SUPPORT="yes"
+
+# Support for partitioning and formating disks in initramfs (yes / no)
+# This adds support for parted and mkfs.ext3/4 to initramfs for OEM usage
+  INITRAMFS_PARTED_SUPPORT="no"
+
+# build with swap support (yes / no)
+  SWAP_SUPPORT="yes"
+
+# swap support enabled per default (yes / no)
+  SWAP_ENABLED_DEFAULT="yes"
+
+# swapfile size if SWAP_SUPPORT=yes in MB
+  SWAPFILESIZE="384"
+
+# additional packages to install:
+# Space separated list is supported,
+# e.g. ADDITIONAL_PACKAGES="PACKAGE1 PACKAGE2"
+
+# build with installer (yes / no)
+  INSTALLER_SUPPORT="no"
+
+# Testpackages for development (yes / no)
+  TESTING="no"
+
+# OEM packages for OEM's (yes / no)
+  OEM_SUPPORT="no"
+
+# build and install nano text editor (yes / no)
+  NANO_EDITOR="yes"
+
+# cron support (yes / no)
+  CRON_SUPPORT="yes"
+
+# Distribution Specific source location
+  DISTRO_MIRROR=""
+  DISTRO_SRC="https://github.com/JustEnoughLinuxOS"
+
+# Default size of system partition, in MB, eg. 512
+  SYSTEM_SIZE=2048
+# Default system partition offset, in sectors, eg. 2048
+  SYSTEM_PART_START=8192
+
+# Default supported get handlers (archive, git, file etc.)
+  GET_HANDLER_SUPPORT="archive git file"
+
+# Partition labels for USB/SD installation media
+  DISTRO_BOOTLABEL="JELOS"
+  DISTRO_DISKLABEL="STORAGE"
+
+# Settings package name - blank if not required
+  DISTRO_PKG_SETTINGS=""
+
+# Enable Updates
+  ENABLE_UPDATES="no"

@@ -1,0 +1,65 @@
+#!/bin/bash
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (C) 2021-present Fewtarius (https://github.com/fewtarius)
+
+. /etc/os-release
+
+
+set_cpu_gov() {
+  for POLICY in ${CPU_FREQ[@]}
+  do
+    if [ -e "${POLICY}/scaling_governor" ]
+    then
+      echo $1 >${POLICY}/scaling_governor 2>/dev/null
+    fi
+  done
+}
+
+set_dmc_gov() {
+  if [ -e "${DMC_FREQ}/governor" ]
+  then
+    echo $1 >${DMC_FREQ}/governor 2>/dev/null || echo dmc_$1 >${DMC_FREQ}/governor 2>/dev/null
+  fi
+}
+
+set_gpu_gov() {
+  if [ -e "${GPU_FREQ}/governor" ]
+  then
+    echo $1 >${GPU_FREQ}/governor 2>/dev/null || echo dmc_$1 >${GPU_FREQ}/governor 2>/dev/null
+  fi
+}
+
+set_amdgpu_perf() {
+  if [ -e "${AMDGPU_PERF}" ]
+  then
+    echo $1 >${AMDGPU_PERF} 2>/dev/null
+  fi
+}
+
+performance() {
+  set_cpu_gov performance
+  set_amdgpu_perf profile_peak
+  set_gpu_gov performance
+  set_dmc_gov performance
+}
+
+ondemand() {
+  set_cpu_gov ondemand
+  set_amdgpu_perf auto
+  set_gpu_gov ondemand
+  set_dmc_gov ondemand
+}
+
+schedutil() {
+  set_cpu_gov schedutil
+  set_amdgpu_perf auto
+  set_gpu_gov ondemand
+  set_dmc_gov ondemand
+}
+
+powersave() {
+  set_cpu_gov powersave
+  set_amdgpu_perf low
+  set_gpu_gov powersave
+  set_dmc_gov powersave
+}
