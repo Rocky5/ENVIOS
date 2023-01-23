@@ -1,4 +1,4 @@
-&nbsp;&nbsp;<img src="https://raw.githubusercontent.com/Rocky5/ENVIOS/main/distributions/JELOS/logos/jelos-logo.png" width=192>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Latest Version](https://img.shields.io/github/release/Rocky5/distribution.svg?color=5998FF&label=latest%20version&style=flat-square)](https://github.com/Rocky5/ENVIOS/releases/latest)
+&nbsp;&nbsp;<img src="https://raw.githubusercontent.com/Rocky5/ENVIOS/main/distributions/JELOS/logos/jelos-logo.png" width=192>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[![Latest Version](https://img.shields.io/github/release/Rocky5/ENVIOS.svg?color=5998FF&label=latest%20version&style=flat-square)](https://github.com/Rocky5/ENVIOS/releases/latest)[![Activity](https://img.shields.io/github/commit-activity/m/Rocky5/ENVIOS?color=5998FF&style=flat-square)](https://github.com/Rocky5/ENVIOS/commits)
 #
 ENVIOS powered by (JELOS, but not supported by) is a community developed Linux distribution for handheld gaming devices.  Our goal is to produce an operating system that has the features and capabilities that we need, and to have fun as we develop it.
 
