@@ -1,6 +1,6 @@
-# Developing and Building JELOS
+# Developing and Building ENVIOS (JELOS)
 
-JELOS is a fairly unique distribution as it is *built to order* and only enough of the operating system and applications are built for the purpose of booting and executing emulators and ports.  Developers and others who would like to contribute to our project should read and agree to the [Contributor Covenant Code of Conduct](https://github.com/JustEnoughLinuxOS/distribution/blob/main/CODE_OF_CONDUCT.md) and [Contributing to JELOS](https://github.com/JustEnoughLinuxOS/distribution/blob/main/CONTRIBUTING.md) guides before submitting your first contribution.
+ENVIOS is a fairly unique distribution as it is *built to order* and only enough of the operating system and applications are built for the purpose of booting and executing emulators and ports.  Developers and others who would like to contribute to our project should read and agree to the [Contributor Covenant Code of Conduct](https://github.com/Rocky5/ENVIOS/blob/main/CODE_OF_CONDUCT.md) and [Contributing to ENVIOS](https://github.com/Rocky5/ENVIOS/blob/main/CONTRIBUTING.md) guides before submitting your first contribution.
 
 
 ## Filesystem Structure
@@ -8,7 +8,7 @@ We have a simple filesystem structure adopted from parent distributions CoreELEC
 
 ```
 .
-├── build.JELOS-DEVICE.ARCHITECTURE
+├── build.ENVIOS-DEVICE.ARCHITECTURE
 ├── config
 ├── distributions
 ├── Dockerfile
@@ -23,9 +23,9 @@ We have a simple filesystem structure adopted from parent distributions CoreELEC
 └── tools
 ```
 
-**build.JELOS-DEVICE.ARCHITECTURE**
+**build.ENVIOS-DEVICE.ARCHITECTURE**
 
-Build roots for each device and that devices architecture(s).  For ARM devices JELOS builds and uses a 32bit root for several of the cores used in the 64bit distribution.
+Build roots for each device and that devices architecture(s).  For ARM devices ENVIOS builds and uses a 32bit root for several of the cores used in the 64bit distribution.
 
 **config**
 
@@ -37,7 +37,7 @@ Distributions contains distribution specific build flags and parameters and spla
 
 **Dockerfile**
 
-Used to build the Ubuntu container used to build JELOS.  The container is hosted at [https://hub.docker.com/u/justenoughlinuxos](https://hub.docker.com/u/justenoughlinuxos)
+Used to build the Ubuntu container used to build ENVIOS.  The container is hosted at [https://hub.docker.com/u/justenoughlinuxos](https://hub.docker.com/u/justenoughlinuxos)
 
 **licenses**
 
@@ -45,11 +45,11 @@ All of the licenses used throughout the distribution packages are hosted here.  
 
 **Makefile**
 
-Used to build one or more JELOS images, or to build and deploy the Ubuntu container.
+Used to build one or more ENVIOS images, or to build and deploy the Ubuntu container.
 
 **packages**
 
-All of the package set that is used to develop and build JELOS are hosted within the packages directory.  The package structure documentation is available in [PACKAGE.md](PACKAGE.md)
+All of the package set that is used to develop and build ENVIOS are hosted within the packages directory.  The package structure documentation is available in [PACKAGE.md](PACKAGE.md)
 
 **post-update**
 
@@ -75,15 +75,15 @@ As the distribution is being built, package source are fetched and hosted in thi
 
 The tools directory contains utility scripts that can be used during the development process, including a simple tool to burn an image to a usb drive or sdcard.
 
-## Building JELOS
-Building JELOS requires an Ubuntu 20.04 host with approximately 200GB of free space for a single device, or 800GB of free space for a full world build.  Other Linux distributions may be used when building using Docker, however this is untested and unsupported.  We recommend building with no more than 8 cores.
+## Building ENVIOS
+Building ENVIOS requires an Ubuntu 20.04 host with approximately 170GB of free space for a single device, or 800GB of free space for a full world build. Other Linux distributions may be used when building using Docker, however this is untested and unsupported.  We recommend building with no more than 8 cores.
 
-### Cloning the JELOS Sources
-To build JELOS, start by cloning the project git repository.
+### Cloning the ENVIOS Sources
+To build ENVIOS, start by cloning the project git repository.
 
 ```
 cd ~
-git clone https://github.com/JustEnoughLinuxOS/distribution.git
+git clone https://github.com/Rocky5/ENVIOS.git
 ```
 
 ### Selecting the Desired Branch
@@ -91,8 +91,7 @@ Once you have cloned the repo, you will want to determine if you want to build t
 
 |Branch|Purpose|
 |----|----|
-|main|Stable JELOS sources|
-|dev|Unstable JELOS sources|
+|main|Stable ENVIOS sources|
 
 To check out our development branch, cd into the project directory and checkout `dev`.
 
@@ -102,7 +101,7 @@ git checkout dev
 ```
 
 ### Building with Docker
-Building JELOS is easy, the fastest and most recommended method is to instruct the build to use Docker, this is only known to work on a Linux system.  To build JELOS with Docker use the table below.
+Building ENVIOS is easy, the fastest and most recommended method is to instruct the build to use Docker, this is only known to work on a Linux system.  To build ENVIOS with Docker use the table below.
 
 | Device | Dependency | Docker Command |
 | ---- | ---- | ---- |
@@ -121,7 +120,7 @@ Building JELOS is easy, the fastest and most recommended method is to instruct t
 > Devices that list a dependency require the dependency to be built first as that build will be used as the root of the device you are building.  This will be done automatically by the build tooling when you start a build for your device.
 
 ### Building Manually
-To build JELOS manually, you will need several prerequisite packages installed.
+To build ENVIOS manually, you will need several prerequisite packages installed.
 
 ```
 sudo apt install gcc make git unzip wget \
@@ -134,17 +133,17 @@ sudo apt install gcc make git unzip wget \
                 qemu-user-binfmt zstd parted imagemagick
 ```
 
-Next, build the version of JELOS for your device.  See the table above for dependencies.  If you're building for the RG351V, RG351P will be built first to provide the build root dependency.  To execute a build, run `make {device}`
+Next, build the version of ENVIOS for your device.  See the table above for dependencies.  If you're building for the RG353P/V/M, RG503 will be built first to provide the build root dependency.  To execute a build, run `make {device}`
 
 ```
-make RG351V
+make RG353P
 ```
 
 ### Building a single package
 It is also possible to build individual packages.
 ```
-DEVICE=RG351V ARCH=aarch64 ./scripts/clean busybox
-DEVICE=RG351V ARCH=aarch64 ./scripts/build busybox
+DEVICE=RG353P ARCH=aarch64 ./scripts/clean busybox
+DEVICE=RG353P ARCH=aarch64 ./scripts/build busybox
 ```
 
 > Note: Emulation Station package build requires additional steps because its source code located in a separate repository, see instructions inside, [link](https://github.com/JustEnoughLinuxOS/distribution/blob/main/packages/ui/emulationstation/package.mk).
