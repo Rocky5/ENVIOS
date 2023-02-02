@@ -11,7 +11,7 @@
   GIT_ORGANIZATION="Rocky5"
 
 # The name of the github project for updates
-  GIT_REPO="distribution"
+  GIT_REPO="ENVIOS"
 
 # Name of the Distro to build (full name, without special characters)
   DISTRONAME="JELOS"

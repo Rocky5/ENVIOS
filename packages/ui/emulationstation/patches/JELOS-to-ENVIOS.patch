@@ -1,8 +1,19 @@
 diff --git a/es-app/src/guis/GuiMenu.cpp b/es-app/src/guis/GuiMenu.cpp
-index 2d131dd..a24eed3 100644
+index 856a55e..7555930 100644
 --- a/es-app/src/guis/GuiMenu.cpp
 +++ b/es-app/src/guis/GuiMenu.cpp
-@@ -403,7 +403,7 @@ void GuiMenu::openDangerZone(Window* mWindow, std::string configName)
+@@ -154,7 +154,9 @@ GuiMenu::GuiMenu(Window *window, bool animate) : GuiComponent(window), mMenu(win
+ 
+ 		if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::WIFI)) {
+ 			addEntry(_("NETWORK SETTINGS").c_str(), true, [this] { openNetworkSettings_batocera(); }, "iconNetwork");
+-		  addEntry(_("MOONLIGHT GAME STREAMING").c_str(), true, [this] { GuiMoonlight::show(mWindow); }, "iconGames");
++			if (SystemConf::getInstance()->get("global.showMOONLIGHT") == "1") {
++			  addEntry(_("MOONLIGHT GAME STREAMING").c_str(), true, [this] { GuiMoonlight::show(mWindow); }, "iconGames");
++			}
+ 		}
+ #else
+ 		if (ApiSystem::getInstance()->isScriptingSupported(ApiSystem::GAMESETTINGS))
+@@ -405,7 +407,7 @@ void GuiMenu::openDangerZone(Window* mWindow, std::string configName)
  	GuiSettings* dangerZone = new GuiSettings(mWindow, _("DANGER ZONE").c_str());
  
      dangerZone->addEntry(_("BACKUP CONFIGURATIONS"), true, [mWindow] {
@@ -11,7 +22,7 @@ index 2d131dd..a24eed3 100644
  				[] {
  				runSystemCommand("/usr/bin/run \"/usr/bin/backuptool backup\"", "", nullptr);
  				}, _("NO"), nullptr));
-@@ -1348,7 +1348,7 @@ void GuiMenu::openSystemSettings_batocera()
+@@ -1357,7 +1359,7 @@ void GuiMenu::openSystemSettings_batocera()
  	s->addSaveFunc([this, optionsOCProfile, selectedOCProfile]
  	{
  		if (optionsOCProfile->changed()) {
@@ -20,7 +31,33 @@ index 2d131dd..a24eed3 100644
                                  [this,optionsOCProfile] {
  					SystemConf::getInstance()->set("system.overclock", optionsOCProfile->getSelected());
  					SystemConf::getInstance()->saveSystemConf();
-@@ -4728,7 +4728,7 @@ void GuiMenu::popSpecificConfigurationGui(Window* mWindow, std::string title, st
+@@ -3711,6 +3713,17 @@ void GuiMenu::openUISettings()
+ 			SystemConf::getInstance()->saveSystemConf();
+ 		});
+ 
++	auto moonlight_enabled = std::make_shared<SwitchComponent>(mWindow);
++	bool moonlightenabled = SystemConf::getInstance()->get("global.showMOONLIGHT") == "1";
++	moonlight_enabled->setState(moonlightenabled);
++	s->addWithLabel(_("SHOW MOONLIGHT GAME STREAMING"), moonlight_enabled);
++	s->addSaveFunc([moonlight_enabled] {
++		bool moonlightenabled = moonlight_enabled->getState();
++	SystemConf::getInstance()->set("global.showMOONLIGHT", moonlightenabled ? "1" : "0");
++			SystemConf::getInstance()->saveSystemConf();
++		});
++
++#if defined(handheld)
+ 	auto desktop_enabled = std::make_shared<SwitchComponent>(mWindow);
+ 	bool desktopEnabled = SystemConf::getInstance()->get("desktop.enabled") == "1";
+ 	desktop_enabled->setState(desktopEnabled);
+@@ -3728,6 +3741,7 @@ void GuiMenu::openUISettings()
+ 			}, "NO",nullptr));
+ 		}
+ 	});
++#endif
+ 
+ 
+ 	s->addGroup(_("DISPLAY OPTIONS"));
+@@ -4765,7 +4779,7 @@ void GuiMenu::popSpecificConfigurationGui(Window* mWindow, std::string title, st
          systemConfiguration->addSaveFunc([optionsOCProfile, selectedOCProfile, configName, mWindow]
          {
                  if (optionsOCProfile->changed()) {
